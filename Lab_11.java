@@ -1,11 +1,14 @@
-import java.util.Scanner;
-import java.lang.Math;
+
+import java.lang.*;
+import java.util.*;
+import java.io.*;
 
 public class Lab_11{
 
   public static final String BORDER_FORMAT = "\033[1;37m";//+"\u001B[46m";
   public static final String ANSI_RESET = "\u001B[0m";
   private Scanner input;
+  private Scanner boardInput;
   private int mirrorsFound = 0;
   private int lazersShot = 0;
   public Lab_11(){
@@ -16,6 +19,7 @@ public class Lab_11{
     
     //generate mirrors
     blackBox = genMirrors(blackBox);
+    saveKey(blackBox);
     
     //set up scanner
     input = new Scanner(System.in);
@@ -36,6 +40,10 @@ public class Lab_11{
         displayBox=guessLocation(blackBox, displayBox, guessCol, guessRow);
       }else if (choice == 3){
         display(blackBox);
+      }else if (choice == 4){
+        System.out.print("What file would you like to replace the board from? ");
+        blackBox=replaceBoard(new File(input.next()));
+        saveKey(blackBox);
       }else{
         System.exit(0);
       }
@@ -74,60 +82,45 @@ public class Lab_11{
     int outputRow=inputRow;
     int outputCol=inputCol;
 
+    //change direction
+    if (array[inputRow][inputCol]=='/'&&direction=='U')
+      outputDirection='R';
+    else if(array[inputRow][inputCol]=='/'&&direction=='D')
+      outputDirection ='L';
+    else if(array[inputRow][inputCol]=='/'&&direction=='L')
+      outputDirection = 'D';
+    else if(array[inputRow][inputCol]=='/'&&direction=='R')
+      outputDirection = 'U';
+    else if (array[inputRow][inputCol]=='\\'&&direction=='U')
+      outputDirection='L';
+    else if(array[inputRow][inputCol]=='\\'&&direction=='D')
+      outputDirection ='R';
+    else if(array[inputRow][inputCol]=='\\'&&direction=='L')
+      outputDirection = 'U';
+    else if(array[inputRow][inputCol]=='\\'&&direction=='R')
+      outputDirection = 'D';
+    
     //move forward
-    if (array[outputRow][outputCol]=='/'){
-        if (outputDirection=='U'){
-          outputDirection='R';
-          outputCol++;
-        }else if (outputDirection=='D'){
-          outputDirection='L';
-          outputCol--;
-        }else if (outputDirection=='L'){
-          outputDirection='D';
-          outputRow++;
-        }else if (outputDirection=='R'){
-          outputDirection='U';
-          outputRow--;
-        }
-      }else if(array[outputRow][outputCol]=='\\'){
-        if (outputDirection=='R'){
-          outputDirection='D';
-          outputRow--;
-        }else if (outputDirection=='D'){
-          outputDirection='R';
-          outputCol--;
-        }else if (outputDirection=='L'){
-          outputDirection='U';
-          outputRow++;
-        }else if (outputDirection=='U'){
-          outputDirection='L';
-          outputCol++;
-        }
-      }else {
-        if (direction == 'R')
-          outputCol++;
-        else if (direction == 'L')
-          outputCol--;
-
-        if (direction == 'U')
-          outputRow--;
-        else if (direction == 'D')
-          outputRow++;
-      }
+    if (outputDirection == 'R')
+      outputCol++;
+    else if (outputDirection == 'L')
+      outputCol--;
+    else if (outputDirection == 'U')
+      outputRow--;
+    else if (outputDirection == 'D')
+      outputRow++;
     
     //check if hit wall of box, return if so
-    if (outputRow<0){
+    if (outputRow<0)
       return (outputCol+20);
-    }else if(outputRow>9){
+    else if(outputRow>9)
       return (outputCol);
-    }else if(outputCol<0){
+    else if(outputCol<0)
       return (19-outputRow);
-    }else if(outputCol>9){
+    else if(outputCol>9)
       return (30+outputRow);
-    }
-
-    //recurse
-    return simulateLaser(array, outputRow, outputCol, outputDirection);
+    else
+      return simulateLaser(array, outputRow, outputCol, outputDirection);
   }
 
   public char[][] guessLocation(char[][] hiddenArray, char[][] knownArray, int guessCol, int guessRow){
@@ -184,10 +177,7 @@ public class Lab_11{
           mirrorPlaced=true;
         }
       }
-    }
-
-    for (var i = 0; i<5; i++){
-      boolean mirrorPlaced=false;
+      mirrorPlaced=false;
       while (mirrorPlaced==false){
         int row = (int)(Math.random()*10);
         int col = (int)(Math.random()*10);
@@ -199,5 +189,49 @@ public class Lab_11{
     }
 
     return board2;
+  }
+
+  public char[][] replaceBoard(File file){
+    try{
+      boardInput = new Scanner(file);
+    }catch(FileNotFoundException ex){
+      System.out.println("Cannot access seed file");
+		  System.exit(1);
+    }
+
+    char[][] board = new char[10][10];
+    for (int r = 0; r<10; r++){
+      for (int c = 0; c<10; c++){
+        board[r][c]=boardInput.next().charAt(0);
+      }
+    }
+    boardInput.close();
+    return board;
+  }
+
+  public void saveKey(char[][] array){
+    File file = new File("key.txt");
+    PrintWriter output = null;
+	  try
+	  {
+		  output = new PrintWriter(file);
+	  }
+	  catch (FileNotFoundException ex)
+	  {
+		  System.out.println("Cannot overwrite file");
+		  System.exit(1);  // quit the program
+	  }
+
+    output.print("\n     20   21   22   23   24   25   26   27   28   29      \n");
+    for (int i = 0; i < 10; i++){
+      output.print(" "+(19-i)+ " ");
+      for (int k = 0; k < 10;k++){
+        output.print("  "+array[i][k]+"  ");
+        //System.out.printf("%3s",item);
+      }
+      output.println(" "+(30+i)+" ");
+    }
+    output.println("      0    1    2    3    4    5    6    7    8    9      \n");
+    output.close();
   }
 }

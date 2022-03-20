@@ -59,13 +59,13 @@ board and tells the user if **guessed** a mirror location or not.  Outputting it
 | On time submission | 4 | 
 | Header filled in with name, block, etc. | 2 |
 | Correctly uploaded zipped replit project to Google Classroom | 2 |
-| Properly create and fill the game board | 5 |
-| Correctly set 10 random mirrors in random locations | 5 |
+| Properly create and fill the game board | 4 |
+| Correctly set 10 random mirrors in random locations | 4 |
 | Proper and **efficient** display of the game board | 5 |
 | Properly written recursive laser method| 0 |
 | Proper game play | 0 |
 | Properly execute hiden Cheat Code| 2 |
-| Proper looping menu with correct game stats| 0 |
+| Proper looping menu with correct game stats| 2 |
 | **Total:** | **25** |
 
 ***  
